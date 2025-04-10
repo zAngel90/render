@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario Credi-Xpress</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f5f1eb;
+            font-family: Arial, sans-serif;
+            color: #333333;
+        }
+        .form-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .form-title {
+            color: #2A5135;
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .form-subtitle {
+            color: #333333;
+            font-size: 16px;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+        .form-reminder {
+            color: #333333;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+        .form-control {
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #4A8B2C;
+            border-radius: 5px;
+            color: #333333;
+        }
+        .form-select {
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #4A8B2C;
+            border-radius: 5px;
+            background-color: white;
+            color: #333333;
+        }
+        .submit-button {
+            width: 100%;
+            padding: 15px;
+            background-color: #4A8B2C;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .submit-button:hover {
+            background-color: #2A5135;
+        }
+        .policy-link {
+            color: #4A8B2C;
+            text-decoration: none;
+        }
+        .policy-link:hover {
+            text-decoration: underline;
+            color: #2A5135;
+        }
+        .form-check {
+            margin-bottom: 25px;
+            color: #333333;
+        }
+        .close-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #4A8B2C;
+            border: none;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .close-button:hover {
+            background: #2A5135;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-container position-relative">
+            <button class="close-button">×</button>
+            <h1 class="form-title">Formulario Credi-Xpress:</h1>
+            
+            <p class="form-subtitle">
+                Por favor ingresa la siguiente información y espera unos segundos para ser 
+                redireccionado a nuestro aliado Bancoomeva, donde podrás gestionar tu 
+                solicitud. Los campos marcados con asterisco son obligatorios.
+            </p>
+
+            <p class="form-reminder">Recuerda tener a la mano tu documento de identidad.</p>
+
+            <form id="creditForm" class="needs-validation" novalidate>
+                <div class="mb-3">
+                    <input type="number" 
+                           class="form-control" 
+                           id="monto" 
+                           placeholder="Monto desde $200.000 hasta $5.000.000 *"
+                           required
+                           min="200000"
+                           max="5000000">
+                </div>
+
+                <div class="mb-3">
+                    <select class="form-select" id="tipoDocumento" required>
+                        <option value="" disabled selected>Tipo de documento *</option>
+                        <option value="1">Cédula de Ciudadanía</option>
+                        <option value="2">Cédula de Extranjería</option>
+                        <option value="3">Pasaporte</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <input type="text" 
+                           class="form-control" 
+                           id="numeroDocumento" 
+                           placeholder="Número de Documento *"
+                           required>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="aceptaPolitica" required>
+                    <label class="form-check-label" for="aceptaPolitica">
+                        Acepto que he leído la <a href="#" class="policy-link">Política de Tratamiento de Datos Personales</a>*
+                    </label>
+                </div>
+
+                <p class="text-muted small mb-4">*Política de Protección de datos personales.</p>
+
+                <button type="submit" class="submit-button">
+                    Inicia tu proceso aquí
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Formatear el monto mientras se escribe
+        document.getElementById('monto').addEventListener('input', function(e) {
+            let value = this.value.replace(/\D/g, '');
+            if (value) {
+                // Guardamos el valor numérico sin formato
+                this.dataset.value = value;
+                // Formateamos para mostrar
+                const formatted = new Intl.NumberFormat('es-CO', {
+                    style: 'decimal',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                }).format(value);
+                this.value = formatted;
+            }
+        });
+
+        document.getElementById('creditForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!document.getElementById('aceptaPolitica').checked) {
+                alert('Debes aceptar la política de tratamiento de datos personales');
+                return;
+            }
+
+            const montoInput = document.getElementById('monto');
+            // Usamos el valor sin formato guardado en dataset, o el valor actual limpiando los puntos
+            const monto = montoInput.dataset.value || montoInput.value.replace(/\D/g, '');
+            const tipoDocumento = document.getElementById('tipoDocumento').value;
+            const numeroDocumento = document.getElementById('numeroDocumento').value;
+
+            if (!monto || !tipoDocumento || !numeroDocumento) {
+                alert('Por favor, completa todos los campos obligatorios');
+                return;
+            }
+
+            if (parseInt(monto) < 200000 || parseInt(monto) > 5000000) {
+                alert('El monto debe estar entre $200,000 y $5,000,000');
+                return;
+            }
+
+            try {
+                const button = e.target.querySelector('button');
+                const originalText = button.innerHTML;
+                button.disabled = true;
+                button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Procesando...';
+
+                const response = await fetch('/api/generate-url', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        monto: parseInt(monto),
+                        tipoDocumento: tipoDocumento,
+                        numeroDocumento: numeroDocumento,
+                        referencia1: 'MOTO2024',
+                        referencia2: numeroDocumento
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.url) {
+                    // Abrir en nueva pestaña y resetear el formulario
+                    window.open(data.url, '_blank');
+                    e.target.reset();
+                    button.disabled = false;
+                    button.innerHTML = originalText;
+                } else {
+                    throw new Error(data.error || 'Error al generar la URL');
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+                const button = e.target.querySelector('button');
+                button.disabled = false;
+                button.innerHTML = 'Inicia tu proceso aquí';
+            }
+        });
+
+        // Cerrar el formulario
+        document.querySelector('.close-button').addEventListener('click', function() {
+            if (confirm('¿Estás seguro de que deseas cerrar el formulario?')) {
+                window.close();
+            }
+        });
+    </script>
+</body>
+</html> 

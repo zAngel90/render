@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta de Reportes - Bancoomeva</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .logo-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .logo-container img {
+            max-width: 200px;
+        }
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .required::after {
+            content: "*";
+            color: red;
+            margin-left: 4px;
+        }
+        .btn-consultar {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 30px;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            .table {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="logo-container">
+            <img src="https://www.bancoomeva.com.co/images/logo.png" alt="Bancoomeva Logo" class="no-print">
+        </div>
+
+        <div class="form-container">
+            <h2 class="text-center mb-4">Consulta de Reportes de Desembolsos</h2>
+            
+            <form id="reportForm" class="needs-validation no-print" novalidate>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="requestId" class="form-label required">ID de Solicitud</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="requestId" required>
+                            <button class="btn btn-outline-secondary" type="button" onclick="generarRequestId()">
+                                <i class="fas fa-sync-alt"></i> Generar
+                            </button>
+                        </div>
+                        <small class="text-muted">Ejemplo: REQ_20231025175707_1234</small>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="aliadoId" class="form-label required">ID del Aliado (NIT)</label>
+                        <input type="text" class="form-control" id="aliadoId" value="860005128" required>
+                        <small class="text-muted">NIT del ejemplo: 860005128 (LibreGreenCartaBienv)</small>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="fechaInicio" class="form-label required">Fecha Inicio</label>
+                        <input type="datetime-local" class="form-control" id="fechaInicio" value="2023-10-25T17:57:07" required>
+                        <small class="text-muted">Ejemplo: 2023-10-25 17:57:07</small>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="fechaFin" class="form-label required">Fecha Fin</label>
+                        <input type="datetime-local" class="form-control" id="fechaFin" value="2023-10-25T18:05:55" required>
+                        <small class="text-muted">Ejemplo: 2023-10-25 18:05:55</small>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="terminal" class="form-label required">Terminal</label>
+                        <input type="text" class="form-control" id="terminal" value="TERM001" required>
+                        <small class="text-muted">Ejemplo: TERM001</small>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="usuario" class="form-label required">Usuario</label>
+                        <input type="text" class="form-control" id="usuario" value="USR001" required>
+                        <small class="text-muted">Ejemplo: USR001</small>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="canal" class="form-label">Canal</label>
+                        <input type="text" class="form-control" id="canal" value="WEB">
+                        <small class="text-muted">Ejemplo: WEB</small>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="numeroDocumento" class="form-label">Número de Documento</label>
+                        <input type="text" class="form-control" id="numeroDocumento" value="25654689">
+                        <small class="text-muted">Ejemplo: 25654689</small>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="referencia1" class="form-label">Referencia 1</label>
+                        <input type="text" class="form-control" id="referencia1" value="100009">
+                        <small class="text-muted">Ejemplo: 100009</small>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="referencia2" class="form-label">Referencia 2</label>
+                        <input type="text" class="form-control" id="referencia2" value="AA032583">
+                        <small class="text-muted">Ejemplo: AA032583</small>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="referencia3" class="form-label">Referencia 3</label>
+                        <input type="text" class="form-control" id="referencia3" value="AB007246">
+                        <small class="text-muted">Ejemplo: AB007246</small>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                    <button type="submit" class="btn btn-consultar">
+                        <i class="fas fa-search me-2"></i>Consultar
+                    </button>
+                </div>
+            </form>
+
+            <div class="loading" id="loadingSpinner">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+                <p class="mt-2">Consultando información...</p>
+            </div>
+
+            <div id="resultados" class="mt-4"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Credenciales y token
+        const credentials = {
+            username: 'natu3626',
+            password: 'A3+ZVBw6'
+        };
+
+        // Función para obtener el token
+        async function getToken() {
+            try {
+                const response = await fetch('https://s5s6nqk77i.execute-api.us-east-1.amazonaws.com/get_tokens_convenio_empresa', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(credentials)
+                });
+                
+                const data = await response.json();
+                return data.data.IdToken;
+            } catch (error) {
+                console.error('Error obteniendo token:', error);
+                throw error;
+            }
+        }
+
+        // Función para generar ID de solicitud
+        function generarRequestId() {
+            const fecha = new Date().toISOString().replace(/[-:]/g, '').split('.')[0];
+            const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+            document.getElementById('requestId').value = `REQ_${fecha}_${random}`;
+        }
+
+        // Generar ID de solicitud al cargar la página
+        window.onload = function() {
+            generarRequestId();
+        };
+
+        document.getElementById('reportForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const resultadosDiv = document.getElementById('resultados');
+            
+            loadingSpinner.style.display = 'block';
+            resultadosDiv.innerHTML = '';
+
+            try {
+                // Primero obtener el token
+                const token = await getToken();
+                console.log('Token obtenido:', token);
+                
+                // Formatear fechas según el formato requerido yyyy-mm-ddTHH:mm:ssZ
+                function formatearFecha(fecha) {
+                    if (!fecha) return '';
+                    
+                    try {
+                        // Convertir la fecha a objeto Date
+                        const d = new Date(fecha);
+                        
+                        // Obtener los componentes de la fecha
+                        const year = d.getFullYear();
+                        const month = String(d.getMonth() + 1).padStart(2, '0');
+                        const day = String(d.getDate()).padStart(2, '0');
+                        const hours = String(d.getHours()).padStart(2, '0');
+                        const minutes = String(d.getMinutes()).padStart(2, '0');
+                        const seconds = String(d.getSeconds()).padStart(2, '0');
+
+                        // Formato exacto: yyyy-mm-ddTHH:mm:ssZ
+                        return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}Z`;
+                    } catch (error) {
+                        console.error('Error al formatear fecha:', error);
+                        throw new Error('Fecha inválida');
+                    }
+                }
+
+                try {
+                    // Obtener los valores de los inputs
+                    const fechaInicioInput = document.getElementById('fechaInicio').value;
+                    const fechaFinInput = document.getElementById('fechaFin').value;
+                    
+                    // Formatear las fechas
+                    const fechaInicio = formatearFecha(fechaInicioInput);
+                    const fechaFin = formatearFecha(fechaFinInput);
+                    const fechaPeticion = formatearFecha(new Date());
+
+                    console.log('Valores de entrada:', {
+                        fechaInicioInput,
+                        fechaFinInput
+                    });
+
+                    console.log('Fechas formateadas:', {
+                        fechaInicio,
+                        fechaFin,
+                        fechaPeticion
+                    });
+
+                    const data = {
+                        requestId: document.getElementById('requestId').value,
+                        aliadoId: document.getElementById('aliadoId').value,
+                        fechaPeticion: fechaPeticion,
+                        terminal: document.getElementById('terminal').value,
+                        canal: document.getElementById('canal').value || 'WEB',
+                        usuario: document.getElementById('usuario').value,
+                        t: new Date().getTime().toString(),
+                        fechaInicio: fechaInicio,
+                        fechaFin: fechaFin,
+                        numeroDocumento: document.getElementById('numeroDocumento').value || '',
+                        referencia1: document.getElementById('referencia1').value || '',
+                        referencia2: document.getElementById('referencia2').value || '',
+                        referencia3: document.getElementById('referencia3').value || ''
+                    };
+
+                    console.log('Datos a enviar:', data);
+
+                    const response = await fetch('/reports', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(data)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Error HTTP: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    console.log('Respuesta recibida:', result);
+                    
+                    if (result.success) {
+                        resultadosDiv.innerHTML = `<pre>${JSON.stringify(result.data, null, 2)}</pre>`;
+                    } else {
+                        resultadosDiv.innerHTML = `<div class="alert alert-danger">Error: ${result.error}</div>`;
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    resultadosDiv.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                resultadosDiv.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+            } finally {
+                loadingSpinner.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html> 
