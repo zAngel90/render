@@ -43,6 +43,10 @@
             border-radius: 5px;
             color: #333333;
         }
+        .form-control:focus {
+            border-color: #4A8B2C;
+            box-shadow: 0 0 0 0.2rem rgba(74, 139, 44, 0.25);
+        }
         .form-select {
             padding: 12px;
             margin-bottom: 20px;
@@ -50,6 +54,10 @@
             border-radius: 5px;
             background-color: white;
             color: #333333;
+        }
+        .form-select:focus {
+            border-color: #4A8B2C;
+            box-shadow: 0 0 0 0.2rem rgba(74, 139, 44, 0.25);
         }
         .submit-button {
             width: 100%;
@@ -114,13 +122,13 @@
 
             <form id="creditForm" class="needs-validation" novalidate>
                 <div class="mb-3">
-                    <input type="number" 
+                    <input type="text" 
                            class="form-control" 
                            id="monto" 
                            placeholder="Monto desde $200.000 hasta $5.000.000 *"
                            required
-                           min="200000"
-                           max="5000000">
+                           pattern="[0-9]*"
+                           inputmode="numeric">
                 </div>
 
                 <div class="mb-3">
